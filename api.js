@@ -1,5 +1,5 @@
 // Ganti dengan Web App URL dari Google Apps Script yang baru Anda deploy (Versi New Deployment)
-const SCRIPT_URL = 'URL_WEB_APP_ANDA_DISINI'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1mqlMxQ0uiwLMd6LwrwDypdf1tYbh5RU4CoeUgSSnAZV44Ae050SZIY5cMbcqxNdyzw/exec'; 
 
 async function rpc(fn, ...args) {
   try {
