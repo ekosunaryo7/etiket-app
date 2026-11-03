@@ -1,16 +1,28 @@
+// Ganti dengan Web App URL dari Google Apps Script yang baru Anda deploy (Versi New Deployment)
 const SCRIPT_URL = 'URL_WEB_APP_ANDA_DISINI'; 
 
 async function rpc(fn, ...args) {
   try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ func: fn, args: args }),
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      }
+    // Memasukkan nama fungsi dan data ke dalam parameter URL (GET Method)
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.append('func', fn);
+    url.searchParams.append('args', JSON.stringify(args));
+    url.searchParams.append('ts', Date.now()); // Mencegah browser menyimpan cache (cache-buster)
+
+    const response = await fetch(url.toString(), {
+      method: 'GET'
     });
     
-    const result = await response.json();
+    // Ambil respons sebagai teks terlebih dahulu untuk menghindari crash JSON parse
+    const text = await response.text();
+    let result;
+    
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      console.error("Respons backend bukan JSON:", text);
+      throw new Error("Gagal terhubung ke server. Pastikan Web App GAS di-deploy dengan akses 'Anyone'.");
+    }
     
     if (!result.success) {
       throw new Error(result.error);
