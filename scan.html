@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1024">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <style>
+    body { background: #0b1024; color: #fff; min-height: 100vh; }
+    .screen { min-height: 100vh; display: none; }
+    .screen.on { display: flex; flex-direction: column; }
+
+    /* Login */
+    #login { align-items: center; justify-content: center; padding: 24px; }
+    .login-card { width: min(380px, 100%); }
+    .login-card .logo { width: 56px; height: 56px; border-radius: 16px; background: var(--sun); color: var(--ink); display: grid; place-items: center; }
+    .login-card h1 { font-size: 30px; margin-top: 18px; }
+    .login-card .input { background: #141b38; border-color: #26305c; color: #fff; }
+    .login-card .input::placeholder { color: #6f7699; }
+    .pin { letter-spacing: .5em; font-size: 22px; text-align: center; }
+
+    /* Scanner */
+    .bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); }
+    .bar .title { font-weight: 700; font-size: 15px; min-width: 0; }
+    .bar .title small { display: block; color: #8b92b5; font-weight: 500; font-size: 12px; }
+    .count { background: #141b38; border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; white-space: nowrap; }
+    .count b { color: var(--sun); }
+    .iconbtn { width: 42px; height: 42px; border-radius: 12px; border: 0; background: #141b38; color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+    .camwrap { position: relative; flex: 1; min-height: 360px; margin: 0 16px; border-radius: 26px; overflow: hidden; background: #050816; }
+    video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .frame { position: absolute; left: 50%; top: 50%; width: min(64vw, 280px); aspect-ratio: 1; transform: translate(-50%, -50%); }
+    .frame i { position: absolute; width: 44px; height: 44px; border: 5px solid var(--sun); }
+    .frame i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 18px 0 0 0; }
+    .frame i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 18px 0 0; }
+    .frame i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 18px; }
+    .frame i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 18px 0; }
+    .frame .laser { position: absolute; left: 8%; right: 8%; height: 3px; background: var(--sun); border-radius: 3px; animation: laser 2.2s ease-in-out infinite; }
+    @keyframes laser { 0%, 100% { top: 12%; } 50% { top: 86%; } }
+    .hint { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; font-weight: 600; color: #e8eaf6; }
+    .camerr { position: absolute; inset: 0; display: none; place-items: center; text-align: center; padding: 24px; color: #c9cdea; }
+
+    .tools { padding: 14px 16px 18px; padding-bottom: max(18px, env(safe-area-inset-bottom)); display: grid; gap: 12px; }
+    .manual { display: flex; gap: 10px; }
+    .manual .input { background: #141b38; border-color: #26305c; color: #fff; text-transform: uppercase; }
+    .recent { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+    .recent span { flex-shrink: 0; background: #141b38; border-radius: 999px; padding: 6px 12px; font-size: 13px; color: #c9cdea; }
+    .recent b { color: #fff; }
+
+    /* Result overlay */
+    .result { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 32px; text-align: center; }
+    .result.on { display: flex; animation: pop .2s ease both; }
+    .result.ok { background: #0f9f7c; }
+    .result.sudah { background: #e69500; color: #1c1300; }
+    .result.invalid { background: #d93a3f; }
+    .result .big { width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.18); display: grid; place-items: center; }
+    .result h2 { font-size: clamp(30px, 8vw, 44px); margin-top: 22px; }
+    .result p { font-size: 18px; margin: 10px 0 0; max-width: 420px; }
+    .result .tiketinfo { margin-top: 22px; background: rgba(0,0,0,.14); border-radius: 18px; padding: 14px 22px; font-weight: 700; font-size: 18px; }
+    .result .tiketinfo small { display: block; font-weight: 600; opacity: .8; font-size: 13px; }
+    .result .tap { position: absolute; bottom: 28px; opacity: .8; font-size: 14px; }
+
+    /* Search sheet */
+    dialog { border: 0; border-radius: 24px; padding: 22px; width: min(460px, calc(100% - 24px)); background: #141b38; color: #fff; }
+    dialog::backdrop { background: rgba(0,0,0,.6); }
+    .hit { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px solid #26305c; }
+    .hit:last-child { border-bottom: 0; }
+    .hit small { color: #8b92b5; display: block; }
+  </style>
+</head>
+<body>
+  <section class="screen" id="login">
+    <form class="login-card" id="formLogin">
+      <div class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg></div>
+      <h1>Check-in panitia</h1>
+      <p style="color:#8b92b5;margin:8px 0 0">Masukkan PIN panitia dari sheet Pengaturan.</p>
+      <label class="field"><span>Nama pos / petugas</span><input class="input" name="petugas" maxlength="40" placeholder="Contoh: Gerbang A" required></label>
+      <label class="field"><span>PIN panitia</span><input class="input pin" name="pin" type="password" inputmode="numeric" maxlength="20" required autocomplete="off"></label>
+      <button class="btn" style="width:100%;margin-top:20px" id="btnLogin">Mulai memindai</button>
+    </form>
+  </section>
+
+  <section class="screen" id="scanner">
+    <div class="bar">
+      <div class="title"><span id="pos">Pos</span><small id="acaraNama">Check-in</small></div>
+      <div class="count" aria-live="polite"><b id="cHadir">0</b> / <span id="cTotal">0</span> hadir</div>
+      <button class="iconbtn" onclick="keluar()" aria-label="Keluar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    </div>
+    <div class="camwrap">
+      <video id="video" playsinline muted></video>
+      <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i><div class="laser"></div></div>
+      <div class="hint" id="hint">Arahkan kamera ke QR e-tiket</div>
+      <div class="camerr" id="camErr"></div>
+    </div>
+    <div class="tools">
+      <form class="manual" id="formManual">
+        <input class="input" name="kode" placeholder="Ketik kode TK-XXXX-XXXX" maxlength="20" autocomplete="off">
+        <button class="btn" style="flex-shrink:0;height:50px">Cek</button>
+      </form>
+      <button class="btn ghost" style="color:#fff" onclick="bukaCari()">Cari nama peserta (tanpa QR)</button>
+      <div class="recent" id="recent"></div>
+    </div>
+  </section>
+
+  <div class="result" id="result" onclick="tutupHasil()" role="alert">
+    <div class="big" id="rIcon"></div>
+    <h2 id="rJudul"></h2>
+    <p id="rPesan"></p>
+    <div class="tiketinfo" id="rTiket" style="display:none"></div>
+    <div class="tap">Ketuk untuk lanjut memindai</div>
+  </div>
+
+  <dialog id="dlgCari">
+    <h3 style="font-size:22px">Cari peserta</h3>
+    <form id="formCari" style="display:flex;gap:10px;margin-top:14px">
+      <input class="input" name="q" placeholder="Nama, kode, atau 4 digit WA" style="background:#0b1024;border-color:#26305c;color:#fff" minlength="3" required>
+      <button class="btn" style="flex-shrink:0">Cari</button>
+    </form>
+    <div id="hasilCari" style="margin-top:10px"></div>
+    <button class="btn ghost" style="width:100%;margin-top:14px;color:#fff" onclick="dlgCari.close()">Tutup</button>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="api.js"></script>
+  <script>
+    var KEY = 'etiket_panitia', sesi = null, stream = null, detector = null, canvas = document.createElement('canvas');
+    var sibuk = false, terakhir = { kode: '', waktu: 0 }, audio = null;
+
+    try { sesi = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { sesi = null; }
+    if (sesi && sesi.token) mulai(); else tampil('login');
+
+    function tampil(id) { $$('.screen').forEach(function (s) { s.classList.toggle('on', s.id === id); }); }
+
+    $('#formLogin').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var f = ev.target, b = $('#btnLogin'); b.disabled = true;
+      rpc('masukPanitia', f.pin.value).then(function (token) {
+        sesi = { token: token, petugas: f.petugas.value.trim() };
+        try { localStorage.setItem(KEY, JSON.stringify(sesi)); } catch (e) {}
+        f.pin.value = '';
+        mulai();
+      }).catch(function (e) { toast(e.message, true); }).then(function () { b.disabled = false; });
+    });
+
+    function keluar() {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      sesi = null; stopKamera(); tampil('login');
+    }
+
+    function mulai() {
+      tampil('scanner');
+      $('#pos').textContent = sesi.petugas || 'Panitia';
+      rpc('getAcara').then(function (a) { $('#acaraNama').textContent = a.nama; }).catch(function () {});
+      segarkanStatistik();
+      setInterval(segarkanStatistik, 15000);
+      nyalakanKamera();
+    }
+
+    function segarkanStatistik() {
+      if (!sesi) return;
+      rpc('statistikPanitia', sesi.token).then(function (s) {
+        $('#cHadir').textContent = s.hadir; $('#cTotal').textContent = s.total;
+        $('#recent').innerHTML = s.terakhir.map(function (r) { return '<span><b>' + esc(r.jam) + '</b> ' + esc(r.nama) + '</span>'; }).join('');
+      }).catch(sesiHabis);
+    }
+
+    function sesiHabis(e) {
+      if (/Sesi/.test(e && e.message)) { toast(e.message, true); keluar(); }
+    }
+
+    function nyalakanKamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return kameraGagal('Browser ini tidak mendukung kamera. Gunakan input kode di bawah.');
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false })
+        .then(function (s) {
+          stream = s; var v = $('#video'); v.srcObject = s; v.play();
+          if ('BarcodeDetector' in window) { try { detector = new BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { detector = null; } }
+          requestAnimationFrame(loop);
+        })
+        .catch(function () { kameraGagal('Izin kamera ditolak. Aktifkan izin kamera di browser, lalu muat ulang halaman.'); });
+    }
+
+    function kameraGagal(pesan) { var el = $('#camErr'); el.style.display = 'grid'; el.textContent = pesan; $('#hint').style.display = 'none'; }
+    function stopKamera() { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+
+    var frameNo = 0;
+    function loop() {
+      if (!stream) return;
+      var v = $('#video');
+      if (!sibuk && v.readyState >= 2 && (frameNo++ % 3 === 0)) {
+        if (detector) {
+          detector.detect(v).then(function (codes) { if (codes.length) proses(codes[0].rawValue); }).catch(function () {});
+        } else if (window.jsQR) {
+          var w = 480, h = Math.round(480 * v.videoHeight / v.videoWidth) || 360;
+          canvas.width = w; canvas.height = h;
+          var g = canvas.getContext('2d', { willReadFrequently: true }); g.drawImage(v, 0, 0, w, h);
+          var hasil = jsQR(g.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: 'dontInvert' });
+          if (hasil) proses(hasil.data);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function proses(kode) {
+      kode = String(kode || '').trim().toUpperCase();
+      if (!kode || sibuk) return;
+      if (kode === terakhir.kode && Date.now() - terakhir.waktu < 4000) return;
+      terakhir = { kode: kode, waktu: Date.now() };
+      sibuk = true;
+      $('#hint').textContent = 'Memeriksa ' + kode + '...';
+      rpc('checkin', sesi.token, kode, sesi.petugas)
+        .then(tampilHasil)
+        .catch(function (e) { sibuk = false; $('#hint').textContent = 'Arahkan kamera ke QR e-tiket'; toast(e.message, true); sesiHabis(e); });
+    }
+
+    var IKON = {
+      ok: '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      sudah: '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5M12 16h.01"/></svg>',
+      invalid: '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+    };
+
+    function tampilHasil(r) {
+      var jenis = r.hasil === 'OK' ? 'ok' : r.hasil === 'SUDAH' ? 'sudah' : 'invalid';
+      var el = $('#result'); el.className = 'result on ' + jenis;
+      $('#rIcon').innerHTML = IKON[jenis];
+      $('#rJudul').textContent = jenis === 'ok' ? 'Silakan masuk' : jenis === 'sudah' ? 'Tiket sudah dipakai' : 'Tiket tidak valid';
+      $('#rPesan').textContent = r.pesan;
+      var ti = $('#rTiket');
+      if (r.tiket) { ti.style.display = 'block'; ti.innerHTML = esc(r.tiket.nama) + '<small>' + esc(r.tiket.jenis) + ' · ' + esc(r.tiket.id) + '</small>'; } else ti.style.display = 'none';
+      bunyi(jenis);
+      if (navigator.vibrate) navigator.vibrate(jenis === 'ok' ? 80 : [120, 80, 120]);
+      clearTimeout(el._h); el._h = setTimeout(tutupHasil, jenis === 'ok' ? 2200 : 3500);
+      if (jenis === 'ok') segarkanStatistik();
+    }
+
+    function tutupHasil() { $('#result').className = 'result'; sibuk = false; $('#hint').textContent = 'Arahkan kamera ke QR e-tiket'; }
+
+    function bunyi(jenis) {
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        var nada = jenis === 'ok' ? [880, 1320] : jenis === 'sudah' ? [520, 520] : [220, 180];
+        nada.forEach(function (f, i) {
+          var o = audio.createOscillator(), g = audio.createGain();
+          o.frequency.value = f; o.type = 'sine'; o.connect(g); g.connect(audio.destination);
+          var t = audio.currentTime + i * 0.16; g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+          o.start(t); o.stop(t + 0.15);
+        });
+      } catch (e) {}
+    }
+
+    $('#formManual').addEventListener('submit', function (ev) { ev.preventDefault(); terakhir = { kode: '', waktu: 0 }; proses(ev.target.kode.value); ev.target.reset(); });
+
+    var dlgCari = $('#dlgCari');
+    function bukaCari() { $('#hasilCari').innerHTML = ''; dlgCari.showModal(); }
+    $('#formCari').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      rpc('cariPeserta', sesi.token, ev.target.q.value).then(function (list) {
+        $('#hasilCari').innerHTML = list.length ? list.map(function (p) {
+          return '<div class="hit"><div><b>' + esc(p.nama) + '</b><small>' + esc(p.jenis) + ' · ' + esc(p.id) + (p.instansi ? ' · ' + esc(p.instansi) : '') + '</small></div>' +
+            (p.status === 'HADIR' ? '<span class="chip" style="background:#0f9f7c">Hadir</span>' : '<button class="btn" style="height:40px;padding:0 16px" data-id="' + esc(p.id) + '">Check-in</button>') + '</div>';
+        }).join('') : '<p style="color:#8b92b5">Tidak ada peserta yang cocok.</p>';
+        $$('#hasilCari button[data-id]').forEach(function (b) {
+          b.onclick = function () { dlgCari.close(); terakhir = { kode: '', waktu: 0 }; proses(b.getAttribute('data-id')); };
+        });
+      }).catch(function (e) { toast(e.message, true); sesiHabis(e); });
+    });
+  </script>
+</body>
+</html>

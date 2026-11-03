@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+    header.top { background: var(--navy); color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); }
+    header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; min-width: 0; }
+    .brand i { width: 34px; height: 34px; border-radius: 10px; background: var(--sun); color: var(--ink); display: grid; place-items: center; flex-shrink: 0; }
+    .brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .linkbtn { background: rgba(255,255,255,.08); border: 0; color: #fff; height: 40px; padding: 0 16px; border-radius: 999px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .linkbtn:hover { background: rgba(255,255,255,.16); }
+
+    .hero { background: var(--navy); color: #fff; padding: 44px 0 64px; overflow: hidden; }
+    .hero .wrap { display: grid; gap: 40px; align-items: center; }
+    @media (min-width: 900px) { .hero .wrap { grid-template-columns: 1.25fr .85fr; } }
+    .status { background: var(--sun); color: var(--ink); }
+    .status.tutup { background: var(--coral); color: #fff; }
+    .hero h1 { font-size: clamp(36px, 6.4vw, 68px); margin-top: 18px; }
+    .hero h1 em { font-style: normal; color: var(--sun); }
+    .tagline { margin-top: 16px; font-size: 18px; color: rgba(255,255,255,.75); max-width: 560px; }
+    .facts { margin-top: 26px; display: grid; gap: 12px; }
+    @media (min-width: 560px) { .facts { grid-template-columns: repeat(3, auto); justify-content: start; gap: 12px 26px; } }
+    .fact { display: flex; gap: 10px; align-items: center; font-weight: 600; }
+    .fact svg { color: var(--sun); flex-shrink: 0; }
+    .fact small { display: block; color: rgba(255,255,255,.55); font-weight: 500; font-size: 12px; }
+    .countdown { margin-top: 30px; display: flex; gap: 10px; }
+    .cd { background: var(--navy-2); border-radius: 14px; padding: 10px 0; width: 72px; text-align: center; }
+    .cd b { display: block; font-family: "Archivo Black"; font-size: 26px; }
+    .cd span { font-size: 11px; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .08em; }
+    .cta-row { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .cta-row .muted { color: rgba(255,255,255,.6); font-size: 14px; }
+
+    /* Decorative ticket in the hero */
+    .stub { position: relative; justify-self: center; width: min(340px, 100%); transform: rotate(-4deg); }
+    .stub .top { background: var(--sun); color: var(--ink); border-radius: 22px 22px 0 0; padding: 26px 26px 22px; }
+    .stub .top small { font-weight: 700; letter-spacing: .2em; font-size: 11px; }
+    .stub .top h3 { font-size: 28px; margin-top: 8px; }
+    .stub .bottom { background: #fff; color: var(--ink); border-radius: 0 0 22px 22px; padding: 22px 26px 26px; display: flex; justify-content: space-between; align-items: center; }
+    .stub .perf { height: 0; border-top: 3px dashed var(--navy); margin: 0 18px; position: relative; }
+    .stub .perf:before, .stub .perf:after { content: ""; position: absolute; top: -15px; width: 28px; height: 28px; border-radius: 50%; background: var(--navy); }
+    .stub .perf:before { left: -32px; } .stub .perf:after { right: -32px; }
+    .stub .admit { font-family: "Archivo Black"; font-size: 13px; letter-spacing: .14em; }
+    .barcode { display: flex; gap: 3px; height: 46px; align-items: stretch; }
+    .barcode i { background: var(--ink); width: 3px; } .barcode i:nth-child(3n) { width: 6px; } .barcode i:nth-child(4n) { width: 2px; }
+
+    main.wrap { padding-top: 56px; padding-bottom: 80px; }
+    .grid2 { display: grid; gap: 28px; }
+    @media (min-width: 960px) { .grid2 { grid-template-columns: 1.1fr .9fr; align-items: start; } }
+    .eyebrow { font-weight: 700; font-size: 13px; letter-spacing: .14em; color: var(--coral); text-transform: uppercase; }
+    h2 { font-size: clamp(26px, 3.6vw, 36px); margin-top: 6px; }
+    .types { margin-top: 20px; display: grid; gap: 12px; }
+    .type { position: relative; display: block; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 18px 20px; cursor: pointer; transition: border-color .15s, transform .15s; }
+    .type:hover { border-color: #cfc6b0; }
+    .type input { position: absolute; opacity: 0; }
+    .type .row { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .type b { font-size: 18px; }
+    .type .ket { font-size: 14px; margin-top: 2px; }
+    .type .radio { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cfc6b0; flex-shrink: 0; display: grid; place-items: center; }
+    .type input:checked ~ .row .radio { border-color: var(--ink); background: var(--ink); }
+    .type input:checked ~ .row .radio:after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sun); }
+    .type:has(input:checked) { border-color: var(--ink); background: #fffdf6; }
+    .type input:focus-visible ~ .row .radio { box-shadow: 0 0 0 4px rgba(255,197,61,.5); }
+    .bar { margin-top: 14px; height: 8px; border-radius: 999px; background: #f1ece0; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--sun); border-radius: 999px; }
+    .sisa { margin-top: 6px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; }
+    .type.habis { opacity: .55; cursor: not-allowed; }
+    .type.habis .bar i { background: var(--coral); }
+
+    .panel { background: var(--card); border: 1.5px solid var(--line); border-radius: 24px; padding: 26px; }
+    .panel h3 { font-size: 22px; }
+    .panel .note { font-size: 13px; margin-top: 12px; }
+    .hp { position: absolute; left: -9999px; }
+    .closed { background: #fff1ec; border: 1.5px solid #ffc9b8; color: #9a3412; padding: 14px 16px; border-radius: 14px; margin-top: 16px; font-weight: 600; }
+
+    .about { margin-top: 48px; display: grid; gap: 16px; }
+    @media (min-width: 760px) { .about { grid-template-columns: 1.3fr 1fr; } }
+    .about .box { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 22px; }
+    .about .box.dark { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .about .box.dark .muted { color: rgba(255,255,255,.65); }
+    .about p { margin: 10px 0 0; }
+
+    /* Ticket view */
+    #tiketView { display: none; padding: 40px 0 80px; }
+    .ticket { max-width: 420px; margin: 0 auto; filter: drop-shadow(0 22px 40px rgba(16,22,47,.18)); }
+    .ticket .head { background: var(--navy); color: #fff; border-radius: 26px 26px 0 0; padding: 26px 26px 30px; }
+    .ticket .head small { color: var(--sun); font-weight: 700; letter-spacing: .2em; font-size: 11px; }
+    .ticket .head h2 { font-size: 26px; margin-top: 8px; color: #fff; }
+    .ticket .meta { margin-top: 16px; display: grid; gap: 6px; font-size: 14px; color: rgba(255,255,255,.8); }
+    .ticket .cut { position: relative; height: 26px; background: #fff; }
+    .ticket .cut:before, .ticket .cut:after { content: ""; position: absolute; top: -13px; width: 26px; height: 26px; border-radius: 50%; background: var(--paper); }
+    .ticket .cut:before { left: -13px; } .ticket .cut:after { right: -13px; }
+    .ticket .cut i { position: absolute; left: 22px; right: 22px; top: 0; border-top: 2.5px dashed #d8d2c2; }
+    .ticket .body { background: #fff; border-radius: 0 0 26px 26px; padding: 4px 26px 28px; text-align: center; }
+    .qr { width: 220px; height: 220px; margin: 6px auto 0; display: grid; place-items: center; }
+    .qr svg, .qr img { width: 100%; height: 100%; }
+    .tid { font-family: "Archivo Black"; font-size: 22px; letter-spacing: .08em; margin-top: 10px; }
+    .who { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+    .who div { background: #f7f4ec; border-radius: 12px; padding: 10px 12px; }
+    .who small { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+    .who b { font-size: 15px; word-break: break-word; }
+    .stt { margin-top: 14px; }
+    .stt.ok { background: #e3f7f1; color: #0f766e; }
+    .stt.wait { background: #fff4d6; color: #8a5a00; }
+    .actions { max-width: 420px; margin: 26px auto 0; display: grid; gap: 10px; }
+    .actions .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    dialog { border: 0; border-radius: 24px; padding: 26px; width: min(420px, calc(100% - 32px)); }
+    dialog::backdrop { background: rgba(16,22,47,.55); }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand">
+        <i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg></i>
+        <span id="penyelenggara">E-Tiket Event</span>
+      </div>
+      <button class="linkbtn" onclick="bukaCari()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        Lihat tiketku
+      </button>
+    </div>
+  </header>
+
+  <div id="halamanDaftar">
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <span class="chip status" id="status">Memuat...</span>
+          <h1 id="judul">&nbsp;</h1>
+          <p class="tagline" id="tagline"></p>
+          <div class="facts">
+            <div class="fact"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><small>Tanggal</small><span id="fTanggal">-</span></div></div>
+            <div class="fact"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><small>Waktu</small><span id="fJam">-</span></div></div>
+            <div class="fact"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><div><small>Tempat</small><span id="fTempat">-</span></div></div>
+          </div>
+          <div class="countdown" id="countdown" aria-label="Hitung mundur acara">
+            <div class="cd"><b id="cdH">0</b><span>Hari</span></div>
+            <div class="cd"><b id="cdJ">0</b><span>Jam</span></div>
+            <div class="cd"><b id="cdM">0</b><span>Menit</span></div>
+            <div class="cd"><b id="cdD">0</b><span>Detik</span></div>
+          </div>
+          <div class="cta-row">
+            <a class="btn" href="#daftar">Daftar sekarang</a>
+            <span class="muted" id="jumlahPeserta"></span>
+          </div>
+        </div>
+        <div class="stub" aria-hidden="true">
+          <div class="top">
+            <small>E-TIKET · ADMIT ONE</small>
+            <h3 id="stubJudul">&nbsp;</h3>
+            <div style="margin-top:10px;font-weight:600" id="stubTanggal"></div>
+          </div>
+          <div class="perf"></div>
+          <div class="bottom">
+            <div><div class="admit">SCAN SAAT MASUK</div><div class="muted" style="font-size:13px;margin-top:4px">QR unik tiap peserta</div></div>
+            <div class="barcode"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="wrap" id="daftar">
+      <div class="grid2">
+        <section>
+          <div class="eyebrow">Langkah 1</div>
+          <h2>Pilih jenis tiket</h2>
+          <div class="types" id="types" role="radiogroup" aria-label="Jenis tiket"></div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Langkah 2</div>
+          <h3 style="margin-top:6px">Isi data peserta</h3>
+          <div id="tutupInfo" class="closed" style="display:none"></div>
+          <form id="form" autocomplete="on">
+            <label class="field"><span>Nama lengkap</span><input class="input" name="nama" required maxlength="80" autocomplete="name" placeholder="Sesuai identitas"></label>
+            <label class="field"><span>Email</span><input class="input" name="email" type="email" required maxlength="100" autocomplete="email" placeholder="nama@email.com"></label>
+            <label class="field"><span>Nomor WhatsApp</span><input class="input" name="wa" type="tel" required maxlength="16" autocomplete="tel" placeholder="08xxxxxxxxxx"></label>
+            <label class="field"><span>Instansi / usaha <span class="muted" style="display:inline;font-weight:500">(opsional)</span></span><input class="input" name="instansi" maxlength="80" placeholder="Nama toko, kampus, atau komunitas"></label>
+            <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <button class="btn dark" id="btnDaftar" style="width:100%;margin-top:20px" type="submit">Ambil e-tiket</button>
+            <p class="note muted">E-tiket berisi QR langsung tampil setelah mendaftar dan dikirim ke email. Satu email untuk satu tiket.</p>
+          </form>
+        </section>
+      </div>
+
+      <div class="about">
+        <div class="box">
+          <div class="eyebrow">Tentang acara</div>
+          <p id="deskripsi"></p>
+        </div>
+        <div class="box dark">
+          <div class="eyebrow" style="color:var(--sun)">Lokasi</div>
+          <p style="font-weight:700;font-size:18px" id="lokasiNama"></p>
+          <p class="muted" id="lokasiAlamat"></p>
+          <a class="btn" id="lokasiMaps" style="margin-top:16px;height:44px" target="_blank" rel="noopener">Buka di Google Maps</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <section id="tiketView">
+    <div class="wrap">
+      <div class="ticket pop" id="ticket">
+        <div class="head">
+          <small>E-TIKET RESMI</small>
+          <h2 id="tJudul"></h2>
+          <div class="meta"><span id="tTanggal"></span><span id="tTempat"></span></div>
+        </div>
+        <div class="cut"><i></i></div>
+        <div class="body">
+          <div class="qr" id="tQr" aria-label="QR code tiket"></div>
+          <div class="tid" id="tId"></div>
+          <span class="chip stt" id="tStatus"></span>
+          <div class="who">
+            <div><small>Nama</small><b id="tNama"></b></div>
+            <div><small>Jenis tiket</small><b id="tJenis"></b></div>
+            <div style="grid-column:1/-1"><small>Email</small><b id="tEmail"></b></div>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="simpanGambar()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          Simpan e-tiket (gambar)
+        </button>
+        <div class="two">
+          <a class="btn ghost" id="btnKalender" target="_blank" rel="noopener">+ Kalender</a>
+          <a class="btn ghost" id="btnShare" target="_blank" rel="noopener">Bagikan</a>
+        </div>
+        <button class="btn ghost" onclick="kembali()">Kembali ke halaman acara</button>
+      </div>
+    </div>
+  </section>
+
+  <dialog id="dlgCari">
+    <h3 style="font-size:22px">Lihat tiketku</h3>
+    <p class="muted" style="margin:6px 0 0">Masukkan email saat mendaftar dan 4 digit terakhir nomor WhatsApp.</p>
+    <form id="formCari">
+      <label class="field"><span>Email</span><input class="input" name="email" type="email" required></label>
+      <label class="field"><span>4 digit terakhir WhatsApp</span><input class="input" name="wa4" inputmode="numeric" pattern="\d{4}" maxlength="4" required></label>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn ghost" type="button" onclick="dlgCari.close()" style="flex:1">Batal</button>
+        <button class="btn dark" type="submit" style="flex:1" id="btnCari">Tampilkan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="api.js"></script>
+  <script>
+    var ACARA = null, TIKET = null;
+    var URL_APP = window.location.origin;
+    var TIKET_AWAL = new URLSearchParams(window.location.search).get('t') || '';
+
+    function muat() {
+      rpc('getAcara').then(function (a) {
+        ACARA = a;
+        document.documentElement.style.setProperty('--sun', a.warna);
+        $('#penyelenggara').textContent = a.penyelenggara || a.nama;
+        var kata = a.nama.split(' ');
+        $('#judul').innerHTML = esc(kata.slice(0, -1).join(' ')) + ' <em>' + esc(kata.slice(-1)[0]) + '</em>';
+        $('#tagline').textContent = a.tagline;
+        $('#fTanggal').textContent = tglPanjang(a.tanggal);
+        $('#fJam').textContent = a.jamMulai + (a.jamSelesai ? ' – ' + a.jamSelesai : '') + ' WIB';
+        $('#fTempat').textContent = a.tempat;
+        $('#stubJudul').textContent = a.nama;
+        $('#stubTanggal').textContent = tglPanjang(a.tanggal) + ' · ' + a.jamMulai;
+        $('#jumlahPeserta').textContent = a.totalPeserta ? a.totalPeserta + ' orang sudah terdaftar' : 'Jadilah pendaftar pertama';
+        $('#deskripsi').textContent = a.deskripsi;
+        $('#lokasiNama').textContent = a.tempat;
+        $('#lokasiAlamat').textContent = a.alamat;
+        if (a.maps) $('#lokasiMaps').href = a.maps; else $('#lokasiMaps').style.display = 'none';
+        var st = $('#status');
+        st.textContent = a.dibuka ? 'Pendaftaran dibuka' : 'Pendaftaran ditutup';
+        st.className = 'chip status' + (a.dibuka ? '' : ' tutup');
+        if (!a.dibuka) {
+          $('#tutupInfo').style.display = 'block'; $('#tutupInfo').textContent = a.alasanTutup;
+          $$('#form input, #form button').forEach(function (el) { el.disabled = true; });
+        }
+        tampilTiketJenis(a.tiket);
+        mulaiHitungMundur();
+      }).catch(function (e) { toast(e.message, true); });
+    }
+
+    function tampilTiketJenis(list) {
+      var pertama = list.filter(function (t) { return t.sisa > 0; })[0];
+      $('#types').innerHTML = list.map(function (t) {
+        var pakai = t.kuota ? Math.round((t.kuota - t.sisa) / t.kuota * 100) : 100;
+        var habis = t.sisa <= 0;
+        return '<label class="type' + (habis ? ' habis' : '') + '">' +
+          '<input type="radio" name="kode" value="' + esc(t.kode) + '"' + (habis ? ' disabled' : '') + (pertama && pertama.kode === t.kode ? ' checked' : '') + '>' +
+          '<div class="row"><div><b>' + esc(t.nama) + '</b><div class="ket muted">' + esc(t.keterangan) + '</div></div><span class="radio"></span></div>' +
+          '<div class="bar"><i style="width:' + pakai + '%"></i></div>' +
+          '<div class="sisa"><span>' + (habis ? 'Kuota habis' : 'Sisa ' + t.sisa + ' tiket') + '</span><span class="muted">Kuota ' + t.kuota + '</span></div>' +
+          '</label>';
+      }).join('');
+    }
+
+    function mulaiHitungMundur() {
+      var m = String(ACARA.tanggal).match(/^(\d{4})-(\d{2})-(\d{2})/), j = String(ACARA.jamMulai || '00:00').split(':');
+      if (!m) { $('#countdown').style.display = 'none'; return; }
+      var target = Date.UTC(+m[1], +m[2] - 1, +m[3], (+j[0] || 0) - 7, +j[1] || 0);
+      function tick() {
+        var s = Math.max(0, Math.floor((target - Date.now()) / 1000));
+        $('#cdH').textContent = Math.floor(s / 86400);
+        $('#cdJ').textContent = Math.floor(s % 86400 / 3600);
+        $('#cdM').textContent = Math.floor(s % 3600 / 60);
+        $('#cdD').textContent = s % 60;
+      }
+      tick(); setInterval(tick, 1000);
+    }
+
+    $('#form').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var f = ev.target, pilih = $('input[name=kode]:checked');
+      if (!pilih) { toast('Pilih jenis tiket dulu.', true); return; }
+      var btn = $('#btnDaftar'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Memproses...';
+      rpc('daftar', { nama: f.nama.value, email: f.email.value, wa: f.wa.value, instansi: f.instansi.value, kode: pilih.value, website: f.website.value })
+        .then(function (t) { f.reset(); tampilTiket(t, true); })
+        .catch(function (e) { toast(e.message, true); })
+        .then(function () { btn.disabled = false; btn.textContent = 'Ambil e-tiket'; });
+    });
+
+    function tampilTiket(t, baru) {
+      TIKET = t;
+      $('#halamanDaftar').style.display = 'none';
+      $('#tiketView').style.display = 'block';
+      window.scrollTo(0, 0);
+      $('#tJudul').textContent = ACARA ? ACARA.nama : '';
+      $('#tTanggal').textContent = ACARA ? tglPanjang(ACARA.tanggal) + ' · ' + ACARA.jamMulai + ' WIB' : '';
+      $('#tTempat').textContent = ACARA ? ACARA.tempat : '';
+      $('#tId').textContent = t.id;
+      $('#tNama').textContent = t.nama;
+      $('#tJenis').textContent = t.jenis;
+      $('#tEmail').textContent = t.email;
+      var s = $('#tStatus');
+      s.textContent = t.status === 'HADIR' ? 'Sudah check-in ' + String(t.checkin).slice(11, 16) : 'Belum check-in';
+      s.className = 'chip stt ' + (t.status === 'HADIR' ? 'ok' : 'wait');
+      var qr = qrcode(0, 'M'); qr.addData(t.id); qr.make();
+      $('#tQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true });
+      if (ACARA) {
+        var m = ACARA.tanggal.replace(/-/g, ''), a = ACARA.jamMulai.replace(':', ''), b = (ACARA.jamSelesai || ACARA.jamMulai).replace(':', '');
+        $('#btnKalender').href = 'https://calendar.google.com/calendar/render?action=TEMPLATE&ctz=Asia/Jakarta&text=' + encodeURIComponent(ACARA.nama) +
+          '&dates=' + m + 'T' + a + '00/' + m + 'T' + b + '00&location=' + encodeURIComponent(ACARA.tempat + ', ' + ACARA.alamat) +
+          '&details=' + encodeURIComponent('Kode tiket: ' + t.id);
+        $('#btnShare').href = 'https://wa.me/?text=' + encodeURIComponent('Aku ikut ' + ACARA.nama + ' (' + tglPanjang(ACARA.tanggal) + '). Daftar juga yuk: ' + URL_APP);
+      }
+      if (baru) toast('Pendaftaran berhasil! Simpan e-tiket ini.');
+      try { history.replaceState(null, '', '?t=' + t.id); } catch (e) {}
+    }
+
+    function kembali() { $('#tiketView').style.display = 'none'; $('#halamanDaftar').style.display = 'block'; muat(); }
+
+    function simpanGambar() {
+      if (!TIKET) return;
+      var W = 720, H = 1080, c = document.createElement('canvas'); c.width = W; c.height = H;
+      var g = c.getContext('2d'), sun = getComputedStyle(document.documentElement).getPropertyValue('--sun').trim() || '#ffc53d';
+      g.fillStyle = '#fff8ec'; g.fillRect(0, 0, W, H);
+      function rr(x, y, w, h, r, fill) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); g.fillStyle = fill; g.fill(); }
+      rr(40, 40, W - 80, H - 80, 36, '#ffffff');
+      g.save(); g.beginPath(); g.rect(40, 40, W - 80, 330); g.clip(); rr(40, 40, W - 80, 400, 36, '#10162f'); g.restore();
+      g.fillStyle = sun; g.font = 'bold 20px "Space Grotesk", sans-serif'; g.fillText('E-TIKET RESMI', 84, 108);
+      g.fillStyle = '#fff'; g.font = '40px "Archivo Black", sans-serif';
+      wrap(ACARA.nama, 84, 166, W - 168, 48, 2);
+      g.font = '24px "Space Grotesk", sans-serif'; g.fillStyle = 'rgba(255,255,255,.8)';
+      g.fillText(tglPanjang(ACARA.tanggal) + ' · ' + ACARA.jamMulai + ' WIB', 84, 290);
+      g.fillText(ACARA.tempat, 84, 326);
+      g.fillStyle = '#fff8ec'; g.beginPath(); g.arc(40, 370, 22, 0, 7); g.fill(); g.beginPath(); g.arc(W - 40, 370, 22, 0, 7); g.fill();
+      g.strokeStyle = '#d8d2c2'; g.setLineDash([12, 10]); g.lineWidth = 3; g.beginPath(); g.moveTo(80, 370); g.lineTo(W - 80, 370); g.stroke(); g.setLineDash([]);
+      var qr = qrcode(0, 'M'); qr.addData(TIKET.id); qr.make();
+      var n = qr.getModuleCount(), size = 360, cell = size / n, ox = (W - size) / 2, oy = 410;
+      g.fillStyle = '#10162f';
+      for (var r = 0; r < n; r++) for (var k = 0; k < n; k++) if (qr.isDark(r, k)) g.fillRect(ox + k * cell, oy + r * cell, cell + .5, cell + .5);
+      g.textAlign = 'center'; g.font = '40px "Archivo Black", sans-serif'; g.fillText(TIKET.id, W / 2, 836);
+      g.font = 'bold 30px "Space Grotesk", sans-serif'; g.fillText(TIKET.nama, W / 2, 900);
+      g.font = '24px "Space Grotesk", sans-serif'; g.fillStyle = '#5c6280'; g.fillText('Tiket ' + TIKET.jenis + ' · tunjukkan QR saat masuk', W / 2, 944);
+      var a = document.createElement('a'); a.download = 'e-tiket-' + TIKET.id + '.png'; a.href = c.toDataURL('image/png'); a.click();
+      function wrap(text, x, y, max, lh, lines) {
+        var words = String(text).split(' '), line = '', count = 0;
+        for (var i = 0; i < words.length; i++) {
+          var test = line ? line + ' ' + words[i] : words[i];
+          if (g.measureText(test).width > max && line) { g.fillText(line, x, y); y += lh; line = words[i]; if (++count >= lines - 1) { line = words.slice(i).join(' '); break; } } else line = test;
+        }
+        g.fillText(line, x, y);
+      }
+    }
+
+    var dlgCari = $('#dlgCari');
+    function bukaCari() { dlgCari.showModal(); }
+    $('#formCari').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var b = $('#btnCari'); b.disabled = true;
+      rpc('cariTiket', ev.target.email.value, ev.target.wa4.value)
+        .then(function (t) { dlgCari.close(); ev.target.reset(); tampilTiket(t); })
+        .catch(function (e) { toast(e.message, true); })
+        .then(function () { b.disabled = false; });
+    });
+
+    muat();
+    if (TIKET_AWAL) {
+      rpc('getTiket', TIKET_AWAL).then(function (t) {
+        var tunggu = setInterval(function () { if (ACARA) { clearInterval(tunggu); tampilTiket(t); } }, 100);
+      }).catch(function (e) { toast(e.message, true); });
+    }
+  </script>
+</body>
+</html>
